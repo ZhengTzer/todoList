@@ -82,6 +82,16 @@ app.post('/todos/:id/edit', (req, res) => {
     .catch((error) => console.log(error))
 })
 
+// delete
+app.post('/todos/:id/delete', (req, res) => {
+  const id = req.params.id
+  return todoModel
+    .findById(id)
+    .then((todo) => todo.remove())
+    .then(() => res.redirect('/'))
+    .catch((error) => console.log(error))
+})
+
 // port listening
 app.listen(port, () => {
   console.log(`web app running at http://localhost:${port}`)
