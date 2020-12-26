@@ -1,28 +1,16 @@
-// declare
+// initial declare
 const express = require('express')
-const app = express()
 const port = 3000
-const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
-const todoModel = require('./models/todoModel')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
+
+// reconfigure
 const routes = require('./routes')
+require('./config/mongoose')
 
-// db setting
-mongoose.connect('mongodb://localhost/todolistDB', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-const db = mongoose.connection
-
-db.on('error', () => {
-  console.log('mongodb error!')
-})
-
-db.once('open', () => {
-  console.log('mongo connected!')
-})
+// final app usage
+const app = express()
 
 // engine setting
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
