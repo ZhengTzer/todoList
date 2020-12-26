@@ -7,6 +7,7 @@ const exphbs = require('express-handlebars')
 const todoModel = require('./models/todoModel')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
+const routes = require('./routes')
 
 // db setting
 mongoose.connect('mongodb://localhost/todolistDB', {
@@ -30,71 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 
 // route setting
-app.get('/', (req, res) => {
-  todoModel
-    .find()
-    .lean()
-    .sort({ _id: 'asc' })
-    .then((todos) => res.render('index', { todos }))
-    .catch((error) => console.log(error))
-})
-
-// new todo
-app.get('/todos/new', (req, res) => {
-  return res.render('new')
-})
-
-app.post('/todos', (req, res) => {
-  const newName = req.body.name
-  return todoModel
-    .create({ name: newName }) // or shorten to just name if same name
-    .then(() => res.redirect('/'))
-    .catch((error) => console.log(error))
-})
-
-// detail
-app.get('/todos/:id', (req, res) => {
-  const id = req.params.id
-  return todoModel
-    .findById(id)
-    .lean()
-    .then((todo) => res.render('detail', { todo }))
-    .catch((error) => console.log(error))
-})
-
-// edit
-app.get('/todos/:id/edit', (req, res) => {
-  const id = req.params.id
-  return todoModel
-    .findById(id)
-    .lean()
-    .then((todo) => res.render('edit', { todo }))
-    .catch((error) => console.log(error))
-})
-
-app.put('/todos/:id', (req, res) => {
-  const id = req.params.id
-  const { name, isDone } = req.body //try to declare same name
-  return todoModel
-    .findById(id)
-    .then((todo) => {
-      todo.name = name
-      todo.isDone = isDone === 'on'
-      return todo.save()
-    })
-    .then(() => res.redirect(`/todos/${id}`))
-    .catch((error) => console.log(error))
-})
-
-// delete
-app.delete('/todos/:id', (req, res) => {
-  const id = req.params.id
-  return todoModel
-    .findById(id)
-    .then((todo) => todo.remove())
-    .then(() => res.redirect('/'))
-    .catch((error) => console.log(error))
-})
+app.use(routes)
 
 // port listening
 app.listen(port, () => {
