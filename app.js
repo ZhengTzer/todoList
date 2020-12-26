@@ -71,11 +71,12 @@ app.get('/todos/:id/edit', (req, res) => {
 
 app.post('/todos/:id/edit', (req, res) => {
   const id = req.params.id
-  const editName = req.body.name
+  const { name, isDone } = req.body //try to declare same name
   return todoModel
     .findById(id)
     .then((todo) => {
-      todo.name = editName
+      todo.name = name
+      todo.isDone = isDone === 'on'
       return todo.save()
     })
     .then(() => res.redirect(`/todos/${id}`))
