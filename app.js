@@ -3,6 +3,8 @@ const express = require('express')
 const app = express()
 const port = 3000
 const mongoose = require('mongoose')
+const exphbs = require('express-handlebars')
+const todoModel = require('./models/todoModel')
 
 // db setting
 mongoose.connect('mongodb://localhost/todolistDB', {
@@ -19,9 +21,17 @@ db.once('open', () => {
   console.log('mongo connected!')
 })
 
+// engine setting
+app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
+app.set('view engine', 'hbs')
+
 // route setting
 app.get('/', (req, res) => {
-  res.send('hi')
+  todoModel
+    .find()
+    .lean()
+    .then((todos) => res.render('index', { todos }))
+    .catch((error) => console.log(error))
 })
 
 // port listening
