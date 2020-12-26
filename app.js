@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
 const todoModel = require('./models/todoModel')
 const bodyParser = require('body-parser')
+const methodOverride = require('method-override')
 
 // db setting
 mongoose.connect('mongodb://localhost/todolistDB', {
@@ -26,6 +27,7 @@ db.once('open', () => {
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(methodOverride('_method'))
 
 // route setting
 app.get('/', (req, res) => {
@@ -70,7 +72,7 @@ app.get('/todos/:id/edit', (req, res) => {
     .catch((error) => console.log(error))
 })
 
-app.post('/todos/:id/edit', (req, res) => {
+app.put('/todos/:id', (req, res) => {
   const id = req.params.id
   const { name, isDone } = req.body //try to declare same name
   return todoModel
@@ -85,7 +87,7 @@ app.post('/todos/:id/edit', (req, res) => {
 })
 
 // delete
-app.post('/todos/:id/delete', (req, res) => {
+app.delete('/todos/:id', (req, res) => {
   const id = req.params.id
   return todoModel
     .findById(id)
