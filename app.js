@@ -5,6 +5,7 @@ const port = 3000
 const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
 const todoModel = require('./models/todoModel')
+const bodyParser = require('body-parser')
 
 // db setting
 mongoose.connect('mongodb://localhost/todolistDB', {
@@ -24,6 +25,7 @@ db.once('open', () => {
 // engine setting
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // route setting
 app.get('/', (req, res) => {
@@ -31,6 +33,29 @@ app.get('/', (req, res) => {
     .find()
     .lean()
     .then((todos) => res.render('index', { todos }))
+    .catch((error) => console.log(error))
+})
+
+// new todo
+app.get('/todos/new', (req, res) => {
+  return res.render('new')
+})
+
+app.post('/todos', (req, res) => {
+  const newName = req.body.name
+  return todoModel
+    .create({ name: newName }) // or shorten to just name if same name
+    .then(() => res.redirect('/'))
+    .catch((error) => console.log(error))
+})
+
+// detail
+app.get('/todos/:id', (req, res) => {
+  const id = req.params.id
+  return todoModel
+    .findById(id)
+    .lean()
+    .then((todo) => res.render('detail', { todo }))
     .catch((error) => console.log(error))
 })
 
