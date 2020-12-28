@@ -9,10 +9,15 @@ router.get('/new', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-  const newName = req.body.name
-  return todoModel
-    .create({ name: newName }) // or shorten to just name if same name
-    .then(() => res.redirect('/'))
+  const newName = String(req.body.name)
+    .split(',')
+    .map((todo) => ({ name: todo }))
+
+  todoModel
+    .insertMany(newName)
+    .then(() => {
+      return res.redirect('/')
+    })
     .catch((error) => console.log(error))
 })
 
